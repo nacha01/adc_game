@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../models/game_info.dart';
-import '../../services/api_service.dart';
 import '../../services/user_session.dart';
+import '../../services/ranking_service.dart';
+import '../../widgets/game_action_button.dart';
+import '../../widgets/game_dialog.dart';
+import '../../widgets/game_panel.dart';
 
-import '../../main.dart';
 import '../../pages/game_result_page.dart';
 
 class Game2048Page extends StatefulWidget {
@@ -49,17 +51,26 @@ class _Game2048PageState extends State<Game2048Page> {
     startGame();
     loadBestScoreFromDb();
   }
-  Future<void> loadBestScoreFromDb() async {
-    if (!UserSession.isLoggedIn) return;
 
-    final result = await ApiService.getMyBestScore(
-      userId: UserSession.userId!,
+  Future<void> loadBestScoreFromDb() async {
+    final userId = UserSession.userId;
+
+    if (!UserSession.isLoggedIn || userId == null) {
+      return;
+    }
+
+    final result = await RankingService.instance.getMyBestScore(
+      userId: userId,
       gameCode: widget.gameInfo.id,
     );
 
-    if (result["success"] == true) {
+    if (!mounted) {
+      return;
+    }
+
+    if (result.success) {
       setState(() {
-        bestScore = int.tryParse(result["best_score"].toString()) ?? 0;
+        bestScore = result.score;
       });
     }
   }
@@ -381,33 +392,20 @@ class _Game2048PageState extends State<Game2048Page> {
   }
 
   Future<void> confirmExit() async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: const Text('게임 종료'),
-          content: Text('게임을 종료하시겠습니까?\n현재 점수는 $score점입니다.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-              child: const Text('취소'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              child: const Text('종료'),
-            ),
-          ],
-        );
-      },
+    final confirmed = await GameDialog.showConfirm(
+      context,
+      title: '게임 종료',
+      message: '게임을 종료하시겠습니까? \n      현재 점수는 $score점입니다.',
+    confirmText: '종료',
+      cancelText: '취소',
+      isDangerous: true,
     );
 
-    if (result == true) {
-      finishGame('사용자 종료');
+    if (!confirmed || !mounted) {
+      return;
     }
+
+    finishGame('사용자 종료');
   }
 
   Color tileColor(int value) {
@@ -504,40 +502,20 @@ class _Game2048PageState extends State<Game2048Page> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              scoreBox('점수', score),
+              GamePanel.value(
+                title: '점수',
+                value: score,
+                width: 120,
+                height: 56,
+              ),
               const SizedBox(width: 18),
-              scoreBox('나의 최고', bestScore),
+              GamePanel.value(
+                title: '나의 최고',
+                value: bestScore,
+                width: 120,
+                height: 56,
+              ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget scoreBox(String title, int value) {
-    return Container(
-      width: 120,
-      height: 56,
-      decoration: BoxDecoration(
-        color: const Color(0xFFC81E1E),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          Text(
-            '$value',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
           ),
         ],
       ),
@@ -652,17 +630,30 @@ class _Game2048PageState extends State<Game2048Page> {
       runSpacing: 8,
       alignment: WrapAlignment.center,
       children: [
-        ElevatedButton(
+        GameActionButton(
+          text: '${selectedRow + 1}행 정렬하기',
+          icon: Icons.sort,
+          width: 170,
+          height: 48,
           onPressed: sortSelectedRow,
-          child: Text('${selectedRow + 1}행 정렬하기'),
         ),
-        ElevatedButton(
+        GameActionButton(
+          text: '다시 시작',
+          icon: Icons.restart_alt,
+          style: GameActionButtonStyle.outlined,
+          width: 150,
+          height: 48,
           onPressed: startGame,
-          child: const Text('다시 시작'),
         ),
-        ElevatedButton(
-          onPressed: confirmExit,
-          child: const Text('게임 종료'),
+        GameActionButton(
+          text: '게임 종료',
+          icon: Icons.stop_circle_outlined,
+          style: GameActionButtonStyle.danger,
+          width: 150,
+          height: 48,
+          onPressed: () {
+            unawaited(confirmExit());
+          },
         ),
       ],
     );

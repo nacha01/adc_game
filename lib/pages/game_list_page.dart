@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../data/game_data.dart';
 import '../models/game_info.dart';
@@ -75,6 +76,10 @@ class _GameListPageState extends State<GameListPage> {
         content: Text("로그아웃되었습니다."),
       ),
     );
+  }
+
+  void exitApp() {
+    SystemNavigator.pop();
   }
 
   @override
@@ -155,20 +160,79 @@ class _GameListPageState extends State<GameListPage> {
       child: Row(
         children: [
           Expanded(
-            child: ElevatedButton(
-              onPressed: goLogin,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFE62D2D),
-                foregroundColor: Colors.white,
+            child: SizedBox(
+              height: 44,
+              child: ElevatedButton(
+                onPressed: goLogin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE62D2D),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "로그인",
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              child: const Text("로그인"),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           Expanded(
-            child: OutlinedButton(
-              onPressed: goSignup,
-              child: const Text("가입하기"),
+            child: SizedBox(
+              height: 44,
+              child: OutlinedButton(
+                onPressed: goSignup,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFE62D2D),
+                  side: const BorderSide(
+                    color: Color(0xFFE62D2D),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "가입하기",
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: SizedBox(
+              height: 44,
+              child: OutlinedButton(
+                onPressed: exitApp,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF666666),
+                  side: const BorderSide(
+                    color: Color(0xFFBDBDBD),
+                  ),
+                  backgroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  "나가기",
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ),
         ],

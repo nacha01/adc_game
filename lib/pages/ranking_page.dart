@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/game_info.dart';
-import '../services/api_service.dart';
+import '../services/ranking_service.dart';
 
 class RankingPage extends StatefulWidget {
   final GameInfo gameInfo;
@@ -17,7 +17,7 @@ class RankingPage extends StatefulWidget {
 
 class _RankingPageState extends State<RankingPage> {
   bool loading = true;
-  List<dynamic> ranking = [];
+  List<RankingEntry> ranking = [];
 
   @override
   void initState() {
@@ -26,12 +26,12 @@ class _RankingPageState extends State<RankingPage> {
   }
 
   Future<void> loadRanking() async {
-    final result = await ApiService.getRanking(
+    final result = await RankingService.instance.getRanking(
       gameCode: widget.gameInfo.id,
     );
 
-    if (result["success"] == true) {
-      ranking = result["ranking"] ?? [];
+    if (result.success) {
+      ranking = result.entries;
     }
 
     setState(() {
@@ -71,13 +71,14 @@ class _RankingPageState extends State<RankingPage> {
                           child: Text("${index + 1}"),
                         ),
                         title: Text(
-                          "${item["name"]}",
+                          item.name,
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         trailing: Text(
-                          "${item["best_score"]}점",
+                          '${item.bestScore}점',
+
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
