@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'web_quiz_page.dart';
 
 import '../data/game_data.dart';
 import '../models/game_info.dart';
@@ -82,6 +83,36 @@ class _GameListPageState extends State<GameListPage> {
     SystemNavigator.pop();
   }
 
+  Future<void> openPuhahaQuiz() async {
+    if (!UserSession.isLoggedIn ||
+        UserSession.username == null) {
+      goLogin();
+      return;
+    }
+
+    if (!await NetworkService.checkInternet(context)) {
+      return;
+    }
+
+    final url =
+        'http://puhaha.pe.kr/quiz/puhaha_quiz.php'
+        '?s_id=${Uri.encodeComponent(UserSession.username!)}';
+
+    if (!mounted) {
+      return;
+    }
+
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => WebQuizPage(
+          title: '푸러푸러 퀴즈',
+          url: url,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,19 +133,23 @@ class _GameListPageState extends State<GameListPage> {
       body: SafeArea(
         child: ListView.builder(
           padding: const EdgeInsets.all(18),
-          itemCount: games.length + 2,
+          itemCount: games.length + 3,
           itemBuilder: (context, index) {
             if (index == 0) {
               return loginArea();
             }
 
-            if (index == games.length + 1) {
-              return waitingMessage();
+            if (index >= 1 && index <= games.length) {
+              final game = games[index - 1];
+              return gameCard(context, game);
             }
 
-            final game = games[index - 1];
+            // 등록된 게임 목록 다음에 웹 퀴즈를 표시합니다.
+            if (index == games.length + 1) {
+              return puhahaQuizCard();
+            }
 
-            return gameCard(context, game);
+            return waitingMessage();
           },
         ),
       ),
@@ -296,6 +331,79 @@ class _GameListPageState extends State<GameListPage> {
                   },
                   child: const Text(
                     '시작하기',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget puhahaQuizCard() {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 18),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () {
+          openPuhahaQuiz();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Row(
+                children: [
+                  Icon(
+                    Icons.quiz_rounded,
+                    color: Color(0xFFE62D2D),
+                    size: 30,
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '푸러푸러 퀴즈',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFE62D2D),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                '로그인한 아이디로 푸러푸러 퀴즈에 참여합니다.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF333333),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE62D2D),
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () {
+                    openPuhahaQuiz();
+                  },
+                  icon: const Icon(Icons.open_in_browser),
+                  label: const Text(
+                    '퀴즈 시작',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
