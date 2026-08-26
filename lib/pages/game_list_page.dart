@@ -118,17 +118,75 @@ class _GameListPageState extends State<GameListPage> {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      appBar: AppBar(
-        title: const Text(
-          '게임 목록',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+        appBar: AppBar(
+          toolbarHeight: 105,
+          titleSpacing: 12,
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 앱 아이콘 + 앱 제목
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/icon/app_icon.png',
+                      width: 42,
+                      height: 42,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  const SizedBox(width: 10),
+
+                  const Text(
+                    '만놀터',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 2),
+
+              // 제목의 의미
+              const Center(
+                child: Text(
+                  '디문고에서 만들고 놀다',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 5),
+
+              // 학교 / 학과
+              const SizedBox(
+                width: double.infinity,
+                child: Text(
+                  '안산디자인문화고등학교 / 미디어콘텐츠과',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
+          centerTitle: true,
+          backgroundColor: const Color(0xFFE62D2D),
+          foregroundColor: Colors.white,
         ),
-        centerTitle: true,
-        backgroundColor: const Color(0xFFE62D2D),
-        foregroundColor: Colors.white,
-      ),
 
       body: SafeArea(
         child: ListView.builder(
