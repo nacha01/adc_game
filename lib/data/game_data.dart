@@ -12,7 +12,7 @@ const List<GameInfo> gameList = [
     id: 'gameMidoriPangpang',
     title: '미도리팡!',
     developer: '최지후',
-    school: '미디어콘첸츠학과',
+    school: '미디어콘텐츠학과',
     description: ' Pygame과 2D 물리 엔진을 활용한 합성 물리 게임',
   ),
 ];

@@ -191,7 +191,7 @@ class _GameListPageState extends State<GameListPage> {
       body: SafeArea(
         child: ListView.builder(
           padding: const EdgeInsets.all(18),
-          itemCount: games.length + 3,
+          itemCount: games.length + 2,
           itemBuilder: (context, index) {
             if (index == 0) {
               return loginArea();
@@ -202,10 +202,7 @@ class _GameListPageState extends State<GameListPage> {
               return gameCard(context, game);
             }
 
-            // 등록된 게임 목록 다음에 웹 퀴즈를 표시합니다.
-            if (index == games.length + 1) {
-              return puhahaQuizCard();
-            }
+
 
             return waitingMessage();
           },
@@ -402,89 +399,15 @@ class _GameListPageState extends State<GameListPage> {
     );
   }
 
-  Widget puhahaQuizCard() {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.only(bottom: 18),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: () {
-          openPuhahaQuiz();
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Row(
-                children: [
-                  Icon(
-                    Icons.quiz_rounded,
-                    color: Color(0xFFE62D2D),
-                    size: 30,
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      '푸러푸러 퀴즈',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFE62D2D),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                '로그인한 아이디로 푸러푸러 퀴즈에 참여합니다.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF333333),
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE62D2D),
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    openPuhahaQuiz();
-                  },
-                  icon: const Icon(Icons.open_in_browser),
-                  label: const Text(
-                    '퀴즈 시작',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget waitingMessage() {
     return const Padding(
       padding: EdgeInsets.symmetric(vertical: 28),
       child: Center(
         child: Text(
-          "★★★★★\n\n"
-              "다음 게임의 주인공은\n"
-              "바로 여러분입니다.\n\n"
-              "여러분들의 게임 제작을\n"
-              "기다립니다.\n\n"
+          "★★★★★\n"
+              "다음 게임의 주인공은 바로 여러분입니다.\n"
+              "여러분들의 게임 제작을 기다립니다.\n"
               "★★★★★",
           textAlign: TextAlign.center,
           style: TextStyle(
