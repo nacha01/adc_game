@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'web_quiz_page.dart';
-
 import '../data/game_data.dart';
 import '../models/game_info.dart';
 import '../services/network_service.dart';
@@ -83,35 +81,6 @@ class _GameListPageState extends State<GameListPage> {
     SystemNavigator.pop();
   }
 
-  Future<void> openPuhahaQuiz() async {
-    if (!UserSession.isLoggedIn ||
-        UserSession.username == null) {
-      goLogin();
-      return;
-    }
-
-    if (!await NetworkService.checkInternet(context)) {
-      return;
-    }
-
-    final url =
-        'http://puhaha.pe.kr/quiz/puhaha_quiz.php'
-        '?s_id=${Uri.encodeComponent(UserSession.username!)}';
-
-    if (!mounted) {
-      return;
-    }
-
-    await Navigator.push<void>(
-      context,
-      MaterialPageRoute<void>(
-        builder: (_) => WebQuizPage(
-          title: '푸러푸러 퀴즈',
-          url: url,
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
