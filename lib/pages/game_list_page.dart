@@ -4,7 +4,7 @@ import '../data/game_data.dart';
 import '../models/game_info.dart';
 import '../services/network_service.dart';
 import '../services/user_session.dart';
-
+import '../services/api_service.dart';
 import 'game_intro_page.dart';
 import 'login_page.dart';
 import 'signup_page.dart';
@@ -75,6 +75,161 @@ class _GameListPageState extends State<GameListPage> {
         content: Text("로그아웃되었습니다."),
       ),
     );
+  }
+
+  Future<void> deleteAccount() async {
+    if (!UserSession.isLoggedIn || UserSession.username == null) {
+      return;
+    }
+
+    final passwordController = TextEditingController();
+
+    // 1단계: 비밀번호 입력
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text("회원 탈퇴"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "회원 탈퇴 시 회원 정보와 모든 게임 기록이 삭제됩니다.\n"
+                    "삭제된 정보는 복구할 수 없습니다.",
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: "비밀번호 확인",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text("취소"),
+            ),
+            TextButton(
+              onPressed: () {
+                if (passwordController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(
+                    const SnackBar(
+                      content: Text("비밀번호를 입력하세요."),
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.pop(dialogContext, true);
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text("탈퇴하기"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) {
+      passwordController.dispose();
+      return;
+    }
+
+    final password = passwordController.text;
+    passwordController.dispose();
+
+    if (!mounted) return;
+
+    // 2단계: 최종 확인
+    final bool? finalConfirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text("정말 탈퇴하시겠습니까?"),
+          content: const Text(
+            "회원 정보와 모든 게임 기록이 영구적으로 삭제됩니다.\n"
+                "삭제된 정보는 복구할 수 없습니다.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text("취소"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text("최종 탈퇴"),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (finalConfirmed != true) {
+      return;
+    }
+
+    // 인터넷 연결 확인
+    if (!await NetworkService.checkInternet(context)) {
+      return;
+    }
+
+    if (!mounted) return;
+
+    // 서버에 회원 탈퇴 요청
+    try {
+      final result = await ApiService.deleteAccount(
+        username: UserSession.username!,
+        password: password,
+      );
+
+      if (!mounted) return;
+
+      if (result["success"] == true) {
+        UserSession.logout();
+
+        setState(() {});
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result["message"] ?? "회원 탈퇴가 완료되었습니다.",
+            ),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result["message"] ?? "회원 탈퇴에 실패했습니다.",
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("회원 탈퇴 처리 중 오류가 발생했습니다."),
+        ),
+      );
+    }
   }
 
   void exitApp() {
@@ -179,7 +334,6 @@ class _GameListPageState extends State<GameListPage> {
       ),
     );
   }
-
   Widget loginArea() {
     if (UserSession.isLoggedIn) {
       return Container(
@@ -200,14 +354,28 @@ class _GameListPageState extends State<GameListPage> {
                 ),
               ),
             ),
+
+            // 로그아웃
             OutlinedButton(
               onPressed: logout,
               child: const Text("로그아웃"),
+            ),
+
+            const SizedBox(width: 8),
+
+            // 회원 탈퇴
+            OutlinedButton(
+              onPressed: deleteAccount,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text("회원탈퇴"),
             ),
           ],
         ),
       );
     }
+
 
     return Container(
       margin: const EdgeInsets.only(bottom: 18),

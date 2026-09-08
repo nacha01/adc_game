@@ -14,7 +14,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   // 자신의 서버 주소로 수정하세요.
   // 예: https://example.com/game_api
-  static const String baseUrl = "http://puhaha.pe.kr/dm_php_api";
+  static const String baseUrl = "https://puhaha.pe.kr/dm_php_api";
 
   static Future<Map<String, dynamic>> getMyBestScore({
     required int userId,
@@ -63,7 +63,20 @@ class ApiService {
 
     return _decodeResponse(response);
   }
+  static Future<Map<String, dynamic>> deleteAccount({
+    required String username,
+    required String password,
+  }) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/delete_account.php"),
+      body: {
+        "username": username,
+        "password": password,
+      },
+    );
 
+    return _decodeResponse(response);
+  }
   static Future<Map<String, dynamic>> saveScore({
     required int userId,
     required String gameCode,
