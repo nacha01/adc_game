@@ -51,5 +51,7 @@ app.*.map.json
 *.jks
 *.keystore
 
-
 .env
+
+# FVM Version Cache
+.fvm/
