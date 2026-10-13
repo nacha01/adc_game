@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../data/game_data.dart';
@@ -50,11 +51,6 @@ class _GameListPageState extends State<GameListPage> {
   }
 
   void openGame(GameInfo game) {
-    if (!UserSession.isLoggedIn) {
-      goLogin();
-      return;
-    }
-
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -314,7 +310,7 @@ class _GameListPageState extends State<GameListPage> {
 
       body: SafeArea(
         child: ListView.builder(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(12),
           itemCount: games.length + 2,
           itemBuilder: (context, index) {
             if (index == 0) {
@@ -384,8 +380,17 @@ class _GameListPageState extends State<GameListPage> {
         color: const Color(0xFFFFF1F1),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Text(
+              '로그인 없이 게임을 즐길 수 있습니다. 랭킹 기록을 남기려면 로그인하세요.',
+              style: TextStyle(fontSize: 13),
+            ),
+          ),
+          Row(children: [
           Expanded(
             child: SizedBox(
               height: 44,
@@ -462,6 +467,7 @@ class _GameListPageState extends State<GameListPage> {
               ),
             ),
           ),
+          ]),
         ],
       ),
     );
@@ -469,73 +475,68 @@ class _GameListPageState extends State<GameListPage> {
 
   Widget gameCard(BuildContext context, GameInfo game) {
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.only(bottom: 18),
+      elevation: 1,
+      margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        onTap: () {
-          openGame(game);
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                game.title,
-                style: const TextStyle(
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFFE62D2D),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '게임 개발자 : ${game.developer} - ${game.school}',
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Color(0xFF555555),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 14),
-              Text(
-                game.description,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF333333),
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE62D2D),
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    openGame(game);
-                  },
-                  child: const Text(
-                    '시작하기',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            Expanded(
+              child: InkWell(
+                onTap: () => openGame(game),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      game.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFE62D2D),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 3),
+                    Text(
+                      game.description,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '게임 개발자 : ${game.developer} - ${game.school}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF666666),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () => openGame(game),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFE62D2D),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                minimumSize: const Size(65, 38),
+              ),
+              child: const Text('시작'),
+            ),
+          ],
         ),
       ),
     );
   }
-
 
   Widget waitingMessage() {
     return const Padding(

@@ -133,6 +133,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void goWithoutLogin() {
+    UserSession.logout();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -237,7 +238,26 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 10),
 
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: OutlinedButton.icon(
+                    onPressed: loading ? null : goWithoutLogin,
+                    icon: const Icon(Icons.sports_esports),
+                    label: const Text("체험하기"),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFE62D2D),
+                      side: const BorderSide(color: Color(0xFFE62D2D)),
+                    ),
+                  ),
+                ),
 
+                const SizedBox(height: 8),
+                const Text(
+                  "로그인 없이 게임을 즐길 수 있습니다.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Color(0xFF666666)),
+                ),
               ],
             ),
           ),

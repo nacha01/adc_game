@@ -34,7 +34,7 @@ class _GameResultPageState extends State<GameResultPage> {
   bool _isSaving = false;
   bool _scoreSaved = false;
   late int _bestScore;
-  String _saveMessage = '로그인하지 않은 경우 점수는 저장되지 않습니다.';
+  String _saveMessage = '게스트로 플레이했습니다. 랭킹에 기록을 남기려면 로그인하세요.';
 
   @override
   void initState() {
